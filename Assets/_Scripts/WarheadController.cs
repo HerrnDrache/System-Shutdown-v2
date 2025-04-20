@@ -61,7 +61,7 @@ public class WarheadController : MonoBehaviour {
         }
     }
 
-    #region Update + related
+    #region Update
     void Update() {
         CountDown();
         UpdateCountdownDisplay();
@@ -73,7 +73,7 @@ public class WarheadController : MonoBehaviour {
         }
 
         timeUntilDetonation -= Time.deltaTime;
-
+        
         if (!counting20Secs && timeUntilDetonation <= 20f + 1f) {
             CountLast20Secs();
         }
@@ -86,7 +86,6 @@ public class WarheadController : MonoBehaviour {
     void UpdateCountdownDisplay() {
         countdownDisplay.text = RemainingTimeToString(timeUntilDetonation);
     }
-    #endregion
 
     void CountLast20Secs() {
         counting20Secs = true;
@@ -129,4 +128,5 @@ public class WarheadController : MonoBehaviour {
     void ResetTimeUntilDetonation() {
         timeUntilDetonation = detonationSequenceClip.length;
     }
+    #endregion
 }

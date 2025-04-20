@@ -802,7 +802,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Running WarheadOS v2.0.4
+  m_text: Running WarheadOS v2.0.4.1
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e87703ff40356004a97d39319c255d15, type: 2}
   m_sharedMaterial: {fileID: 699253846153141623, guid: e87703ff40356004a97d39319c255d15, type: 2}
@@ -1582,8 +1582,8 @@ MonoBehaviour:
   countdownText: {fileID: 1174506311}
   countdownDisplay: {fileID: 405750658}
   engageButton: {fileID: 140223205}
-  warningText1: {fileID: 314574721}
-  warningText2: {fileID: 1852919653}
+  warningText1: {fileID: 314574719}
+  warningText2: {fileID: 1852919651}
 --- !u!1 &1852919651
 GameObject:
   m_ObjectHideFlags: 0
