@@ -9,6 +9,8 @@ public class InterfaceManipulation : MonoBehaviour {
     [SerializeField] GameObject countdownText;
     [SerializeField] GameObject countdownDisplay;
     [SerializeField] GameObject engageButton;
+    [SerializeField] TMP_Text warningText1;
+    [SerializeField] TMP_Text warningText2;
 
     void Awake() {
         Singleton = this;
@@ -17,6 +19,8 @@ public class InterfaceManipulation : MonoBehaviour {
     public void HideEngageButton() {
         KillCurrentTweens();
 
+        engageButton.GetComponent<Button>()
+            .interactable = false;
         engageButton.GetComponent<Image>()
             .DOFade(0f, 3f);
 
@@ -51,7 +55,38 @@ public class InterfaceManipulation : MonoBehaviour {
                     .DOFade(1f, 1f);
 
                 engageButton.GetComponentInChildren<TMP_Text>()
-                    .DOFade(1f, 1f);
+                    .DOFade(1f, 1f)
+
+                .OnComplete(() => {
+                    engageButton.GetComponent<Button>()
+                        .interactable = true;
+                });
+            });
+        });
+    }
+
+    public void BlinkWarning() {
+        if (WarheadController.Singleton.GetTimeUntilDetonation() <= 0f) { return; }
+
+        Invoke(nameof(BlinkWarning), 1f);
+
+        warningText1.GetComponent<TMP_Text>()
+            .DOFade(1f, 0.25f)
+
+        .OnComplete(() => {
+            DOVirtual.DelayedCall(0.5f, () => {
+                warningText1.GetComponent<TMP_Text>()
+                    .DOFade(0f, 0.25f);
+            });
+        });
+
+        warningText2.GetComponent<TMP_Text>()
+            .DOFade(1f, 0.25f)
+
+        .OnComplete(() => {
+            DOVirtual.DelayedCall(0.5f, () => {
+                warningText2.GetComponent<TMP_Text>()
+                    .DOFade(0f, 0.25f);
             });
         });
     }

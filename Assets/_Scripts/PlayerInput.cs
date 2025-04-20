@@ -19,7 +19,7 @@ public class PlayerInput : MonoBehaviour {
     }
 
     void Update() {
-        if (WarheadController.Singleton.GetTimeUntilDetonation() <= 15f) { return; }
+        if (WarheadController.Singleton.GetTimeUntilDetonation() <= 20f) { return; }
         if (cancelKeyPressTime < 3f) { return; }
 
         cancelKeyPressTime = 0f;
