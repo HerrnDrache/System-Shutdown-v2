@@ -6,11 +6,13 @@ using UnityEngine.UI;
 public class InterfaceManipulation : MonoBehaviour {
     public static InterfaceManipulation Singleton { get; private set; }
 
+    [SerializeField] GameObject titeltext;
     [SerializeField] GameObject countdownText;
     [SerializeField] GameObject countdownDisplay;
     [SerializeField] GameObject engageButton;
     [SerializeField] GameObject warningText1;
     [SerializeField] GameObject warningText2;
+    [SerializeField] TMP_Text statusDisplay;
 
     void Awake() {
         Singleton = this;
@@ -21,10 +23,14 @@ public class InterfaceManipulation : MonoBehaviour {
 
         engageButton.GetComponent<Button>()
             .interactable = false;
+        
         engageButton.GetComponent<Image>()
             .DOFade(0f, 3f);
-
         engageButton.GetComponentInChildren<TMP_Text>()
+            .DOFade(0f, 3f);
+        statusDisplay.GetComponentInChildren<TMP_Text>()
+            .DOFade(0f, 5f);
+        titeltext.GetComponent<TMP_Text>()
             .DOFade(0f, 3f)
 
         .OnComplete(() => {
@@ -50,23 +56,29 @@ public class InterfaceManipulation : MonoBehaviour {
             .DOFade(0f, 1f)
         
         .OnComplete(() => {
-            DOVirtual.DelayedCall(2.5f, () => {
-                engageButton.GetComponent<Image>()
-                    .DOFade(1f, 1f);
+            titeltext.GetComponent<TMP_Text>()
+            .DOFade(1f, 1f);
+            statusDisplay.GetComponentInChildren<TMP_Text>()
+            .DOFade(1f, 1f)
+        
+            .OnComplete(() => {
+                DOVirtual.DelayedCall(17f, () => {
+                    engageButton.GetComponent<Image>()
+                        .DOFade(1f, 1f);
+                    engageButton.GetComponentInChildren<TMP_Text>()
+                        .DOFade(1f, 1f)
 
-                engageButton.GetComponentInChildren<TMP_Text>()
-                    .DOFade(1f, 1f)
-
-                .OnComplete(() => {
-                    engageButton.GetComponent<Button>()
-                        .interactable = true;
+                    .OnComplete(() => {
+                        engageButton.GetComponent<Button>()
+                            .interactable = true;
+                    });
                 });
             });
-        });
+        });        
     }
 
     public void BlinkWarning() {
-        if (WarheadController.Singleton.GetTimeUntilDetonation() <= 0f) { return; }
+        if (WarheadController.Singleton.GetTimeUntilDetonation() <= 0.9f) { return; }
 
         Invoke(nameof(BlinkWarning), 1f);
 

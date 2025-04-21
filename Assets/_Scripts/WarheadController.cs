@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Diagnostics;
 using TMPro;
 using UnityEngine;
@@ -8,6 +9,7 @@ public class WarheadController : MonoBehaviour {
     public static WarheadController Singleton { get; private set; }
 
     [SerializeField] TMP_Text countdownDisplay;
+    [SerializeField] TMP_Text statusDisplay;
     [SerializeField] float displayTimeAfter;
     [SerializeField] AudioSource source;
     [SerializeField] AudioClip detonationSequenceClip;
@@ -33,6 +35,7 @@ public class WarheadController : MonoBehaviour {
         Singleton = this;
 
         ResetTimeUntilDetonation();
+        SetStatus("Ready", "#00ff00");
     }
 
     public void EngageWarhead() {
@@ -40,6 +43,7 @@ public class WarheadController : MonoBehaviour {
         isRunning = true;
         counting20Secs = false;
 
+        SetStatus("Running...", "#ff0000");
         source.clip = detonationSequenceClip;
         source.Play();
     }
@@ -55,10 +59,22 @@ public class WarheadController : MonoBehaviour {
         isRunning = false;
         source.Stop();
 
+        SetStatus("Restarting...", "#ffff00");
+        StartCoroutine(SetStatusReadyAfterDelay());
+
         if (playCancelSound) {
             source.clip = cancelClip;
             source.Play();
         }
+    }
+
+    IEnumerator SetStatusReadyAfterDelay() {
+        yield return new WaitForSeconds(20f);
+        SetStatus("Ready", "#00ff00");
+    }
+
+    void SetStatus(string statusText, string colorHex) {
+        statusDisplay.text = $"SYSTEM STATUS: <color={colorHex}>{statusText}</color>";
     }
 
     #region Update
@@ -110,8 +126,7 @@ public class WarheadController : MonoBehaviour {
 
     string RemainingTimeToString(float remainingTime) {
         if (remainingTime <= 0f) {
-            return
-                $"00:00:000";
+            return $"00:00:000";
         }
 
         if (remainingTime > displayTimeAfter) {
