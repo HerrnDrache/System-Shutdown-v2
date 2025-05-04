@@ -33,12 +33,15 @@ public class WarheadController : MonoBehaviour {
 
     void Awake() {
         Singleton = this;
+    }
 
+    void Start() {
         ResetTimeUntilDetonation();
         SetStatus("Ready", "#00ff00");
     }
 
     public void EngageWarhead() {
+        DiscordManager.Singleton.SetEngageActivity();
         InterfaceManipulation.Singleton.HideEngageButton();
         isRunning = true;
         counting20Secs = false;
@@ -46,6 +49,7 @@ public class WarheadController : MonoBehaviour {
         SetStatus("Running...", "#ff0000");
         source.clip = detonationSequenceClip;
         source.Play();
+        InvokeRepeating(nameof(UpdateDiscordActivity), 12.5f, 5f);
     }
 
     public void CancelWarhead(bool playCancelSound) {
@@ -54,6 +58,8 @@ public class WarheadController : MonoBehaviour {
         }
 
         Invoke(nameof(ResetTimeUntilDetonation), 1f);
+        CancelInvoke(nameof(UpdateDiscordActivity));
+        DiscordManager.Singleton.SetWaitingActivity();
 
         InterfaceManipulation.Singleton.ShowEngageButton();
         isRunning = false;
@@ -71,6 +77,7 @@ public class WarheadController : MonoBehaviour {
     IEnumerator SetStatusReadyAfterDelay() {
         yield return new WaitForSeconds(20f);
         SetStatus("Ready", "#00ff00");
+        DiscordManager.Singleton.SetStartupActivity();
     }
 
     void SetStatus(string statusText, string colorHex) {
@@ -81,6 +88,10 @@ public class WarheadController : MonoBehaviour {
     void Update() {
         CountDown();
         UpdateCountdownDisplay();
+    }
+
+    void UpdateDiscordActivity() {
+        DiscordManager.Singleton.SetDetonationActivity();
     }
 
     void CountDown() {
@@ -111,6 +122,7 @@ public class WarheadController : MonoBehaviour {
 
     void SystemShutdown() {
         shutdownInProgress = true;
+        DiscordManager.Singleton.SetShutdownActivity();
 
 #if !UNITY_EDITOR
         var shutdownProcess = new ProcessStartInfo("shutdown", "/s /t 0") {

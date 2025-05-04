@@ -24,12 +24,12 @@ public class InterfaceManipulation : MonoBehaviour {
         engageButton.GetComponent<Button>()
             .interactable = false;
         
+        statusDisplay.GetComponent<TMP_Text>()
+            .DOFade(0f, 5f);
         engageButton.GetComponent<Image>()
             .DOFade(0f, 3f);
         engageButton.GetComponentInChildren<TMP_Text>()
             .DOFade(0f, 3f);
-        statusDisplay.GetComponentInChildren<TMP_Text>()
-            .DOFade(0f, 5f);
         titeltext.GetComponent<TMP_Text>()
             .DOFade(0f, 3f)
 
