@@ -37,36 +37,7 @@ public class DiscordManager : MonoBehaviour {
     }
 
     public void SetStartupActivity() {
-        UpdateActivity(details, state, largeImage, false);
-    }
-
-    public void SetDetonationActivity() {
-        var displayedTime = Mathf.Floor(Mathf.Max(
-            WarheadController.Singleton.GetTimeUntilDetonation(),
-            0f));
-
-        try {
-            var activityManager = discord.GetActivityManager();
-            var newActivity = new Discord.Activity {
-                Details = "Detonation in Progress", // Upper Text
-                State = $"In T-{displayedTime}", // Lower Text
-                Timestamps = {
-                    Start = time
-                }
-            };
-
-            activityManager.UpdateActivity(newActivity, (res) => {
-                if (res != Discord.Result.Ok) {
-                    Debug.LogWarning($"[{nameof(DiscordManager)}] Couldn't update activity! Error: {res}");
-                }
-            });
-        } catch {
-            Destroy(gameObject);
-        }
-    }
-
-    public void UpdateActivity(string details, string state, string largeImage, bool updateTime) {
-        UpdateActivity(details, true);
+        UpdateActivity(details, false);
     }
 
     public void SetEngageActivity() {
