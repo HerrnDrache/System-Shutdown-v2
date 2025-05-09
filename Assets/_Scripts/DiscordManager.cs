@@ -10,8 +10,6 @@ public class DiscordManager : MonoBehaviour {
 
     [Header("Startup Activity")]
     [SerializeField] string details;
-    [SerializeField] string state;
-    [SerializeField] string largeImage;
 
     void Awake() {
         if (Singleton == null) {
@@ -68,6 +66,32 @@ public class DiscordManager : MonoBehaviour {
     }
 
     public void UpdateActivity(string details, string state, string largeImage, bool updateTime) {
+        UpdateActivity(details, true);
+    }
+
+    public void SetEngageActivity() {
+        UpdateActivity("Detonation Engaged...", true);
+    }
+
+    public void SetDetonationActivity() {
+        var displayedTime = Mathf.Floor(WarheadController.Singleton.GetTimeUntilDetonation());
+
+        if (displayedTime <= 0) {
+            return;
+        }
+
+        UpdateActivity($"Detonation in T-{displayedTime}", false);
+    }
+
+    public void SetShutdownActivity() {
+        UpdateActivity("Detonation completed, User offline since:", true);
+    }
+
+    public void SetWaitingActivity() {
+        UpdateActivity("System Restarting...", false);
+    }
+
+    public void UpdateActivity(string details, bool updateTime) {
         if (updateTime) {
             UpdateTime();
         }
@@ -75,12 +99,7 @@ public class DiscordManager : MonoBehaviour {
         try {
             var activityManager = discord.GetActivityManager();
             var newActivity = new Discord.Activity {
-                Details = details, // Upper Text
-                State = state, // Lower Text
-                Assets = {
-                    LargeImage = largeImage.ToLower(),
-                    LargeText = "discord.gg/c7cb5MRbth",
-                },
+                Details = details,
                 Timestamps = {
                     Start = time
                 }

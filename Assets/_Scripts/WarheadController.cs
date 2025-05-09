@@ -1,4 +1,5 @@
-using System.Diagnostics; // Required, don't remove !!!
+using System.Collections;
+using System.Diagnostics;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,15 +9,12 @@ public class WarheadController : MonoBehaviour {
     public static WarheadController Singleton { get; private set; }
 
     [SerializeField] TMP_Text countdownDisplay;
-    [SerializeField] Button cancelButtonComp;
+    [SerializeField] TMP_Text statusDisplay;
     [SerializeField] float displayTimeAfter;
     [SerializeField] AudioSource source;
     [SerializeField] AudioClip detonationSequenceClip;
     [SerializeField] AudioClip last20Secs;
     [SerializeField] AudioClip cancelClip;
-
-    // const int TIME_UNTIL_DETONATION = 30;
-    const string TIME_UNTIL_DETONATION_SUB = "[Zeit zur Detonation]";
 
     float timeUntilDetonation;
     bool isRunning;
@@ -39,16 +37,19 @@ public class WarheadController : MonoBehaviour {
 
     void Start() {
         ResetTimeUntilDetonation();
-        InvokeRepeating(nameof(UpdateDiscordActivity), 0f, 5f);
+        SetStatus("Ready", "#00ff00");
     }
 
     public void EngageWarhead() {
+        DiscordManager.Singleton.SetEngageActivity();
         InterfaceManipulation.Singleton.HideEngageButton();
         isRunning = true;
         counting20Secs = false;
 
+        SetStatus("Running...", "#ff0000");
         source.clip = detonationSequenceClip;
         source.Play();
+        InvokeRepeating(nameof(UpdateDiscordActivity), 12.5f, 5f);
     }
 
     public void CancelWarhead(bool playCancelSound) {
@@ -56,12 +57,16 @@ public class WarheadController : MonoBehaviour {
             return;
         }
 
-        ResetTimeUntilDetonation();
-        DiscordManager.Singleton.SetStartupActivity();
+        Invoke(nameof(ResetTimeUntilDetonation), 1f);
+        CancelInvoke(nameof(UpdateDiscordActivity));
+        DiscordManager.Singleton.SetWaitingActivity();
 
         InterfaceManipulation.Singleton.ShowEngageButton();
         isRunning = false;
         source.Stop();
+
+        SetStatus("Restarting...", "#ffff00");
+        StartCoroutine(SetStatusReadyAfterDelay());
 
         if (playCancelSound) {
             source.clip = cancelClip;
@@ -69,15 +74,23 @@ public class WarheadController : MonoBehaviour {
         }
     }
 
-    #region Update + related
+    IEnumerator SetStatusReadyAfterDelay() {
+        yield return new WaitForSeconds(20f);
+        SetStatus("Ready", "#00ff00");
+        DiscordManager.Singleton.SetStartupActivity();
+    }
+
+    void SetStatus(string statusText, string colorHex) {
+        statusDisplay.text = $"SYSTEM STATUS: <color={colorHex}>{statusText}</color>";
+    }
+
+    #region Update
     void Update() {
         CountDown();
         UpdateCountdownDisplay();
     }
 
     void UpdateDiscordActivity() {
-        if (!isRunning) { return; }
-
         DiscordManager.Singleton.SetDetonationActivity();
     }
 
@@ -85,11 +98,7 @@ public class WarheadController : MonoBehaviour {
         if (!isRunning) { return; }
 
         timeUntilDetonation -= Time.deltaTime;
-
-        if (cancelButtonComp.interactable && timeUntilDetonation <= 25f) {
-            cancelButtonComp.interactable = false;
-        }
-
+        
         if (!counting20Secs && timeUntilDetonation <= 20f + 1f) {
             CountLast20Secs();
         }
@@ -102,16 +111,16 @@ public class WarheadController : MonoBehaviour {
     void UpdateCountdownDisplay() {
         countdownDisplay.text = RemainingTimeToString(timeUntilDetonation);
     }
-    #endregion
 
     void CountLast20Secs() {
         counting20Secs = true;
-
+        InterfaceManipulation.Singleton.BlinkWarning();
         source.PlayOneShot(last20Secs);
     }
 
     void SystemShutdown() {
         shutdownInProgress = true;
+        DiscordManager.Singleton.SetShutdownActivity();
 
 #if !UNITY_EDITOR
         var shutdownProcess = new ProcessStartInfo("shutdown", "/s /t 0") {
@@ -127,8 +136,7 @@ public class WarheadController : MonoBehaviour {
 
     string RemainingTimeToString(float remainingTime) {
         if (remainingTime <= 0f) {
-            return
-                $"00:00:000";
+            return $"00:00:000";
         }
 
         if (remainingTime > displayTimeAfter) {
@@ -145,4 +153,5 @@ public class WarheadController : MonoBehaviour {
     void ResetTimeUntilDetonation() {
         timeUntilDetonation = detonationSequenceClip.length;
     }
+    #endregion
 }
