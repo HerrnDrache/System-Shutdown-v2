@@ -95,7 +95,9 @@ public class WarheadController : MonoBehaviour {
     }
 
     void CountDown() {
-        if (!isRunning) { return; }
+        if (!isRunning) { 
+            return;
+        }
 
         timeUntilDetonation -= Time.deltaTime;
         
@@ -114,7 +116,7 @@ public class WarheadController : MonoBehaviour {
 
     void CountLast20Secs() {
         counting20Secs = true;
-        InterfaceManipulation.Singleton.BlinkWarning();
+        InterfaceManipulation.Singleton.BlinkDelay();
         source.PlayOneShot(last20Secs);
     }
 
