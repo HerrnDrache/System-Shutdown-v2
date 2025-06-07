@@ -127,7 +127,7 @@ public class WarheadController : MonoBehaviour {
 
 	void CountLast20Secs() {
 		counting20Secs = true;
-		InterfaceManipulation.Singleton.BlinkDelay();
+		InterfaceManipulation.Singleton.BlinkWarning();
 		source.PlayOneShot(last20Secs);
 	}
 
