@@ -78,9 +78,7 @@ public class InterfaceManipulation : MonoBehaviour {
 	}
 
 	public void BlinkWarning() {
-		if (WarheadController.Singleton.GetTimeUntilDetonation() <= 0.9f) {
-			return;
-		}
+		if (WarheadController.Singleton.GetTimeUntilDetonation() <= 0.9f) return;
 
 		Invoke(nameof(BlinkWarning), 1f);
 

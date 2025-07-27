@@ -148,7 +148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc0919d0f0c876f4caf44f0abe2731fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  details: System Ready
+  startDetails: Waiting for Data...
 --- !u!4 &65978003
 Transform:
   m_ObjectHideFlags: 0

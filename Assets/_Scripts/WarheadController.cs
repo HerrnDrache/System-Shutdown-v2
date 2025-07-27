@@ -56,9 +56,7 @@ public class WarheadController : MonoBehaviour {
 	}
 
 	public void CancelWarhead(bool playCancelSound) {
-		if (!isRunning) {
-			return;
-		}
+		if (!isRunning) return;
 
 		Invoke(nameof(ResetTimeUntilDetonation), 1f);
 		CancelInvoke(nameof(UpdateDiscordActivity));
@@ -106,9 +104,7 @@ public class WarheadController : MonoBehaviour {
 	}
 
 	void CountDown() {
-		if (!isRunning) { 
-			return;
-		}
+		if (!isRunning) return;
 
 		timeUntilDetonation -= Time.deltaTime;
 		

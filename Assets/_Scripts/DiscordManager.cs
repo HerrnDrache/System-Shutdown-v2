@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class DiscordManager : MonoBehaviour {
@@ -9,7 +10,7 @@ public class DiscordManager : MonoBehaviour {
 	long time;
 
 	[Header("Startup Activity")]
-	[SerializeField] string details;
+	[SerializeField] string startDetails;
 
 	void Awake() {
 		if (Singleton == null) {
@@ -21,23 +22,30 @@ public class DiscordManager : MonoBehaviour {
 	}
 
 	void Start() {
-		discord = new Discord.Discord(GAME_ID, (ulong) Discord.CreateFlags.NoRequireDiscord);
-		Debug.Log($"[{nameof(DiscordManager)}] Initialised Discord");
+		try {
+			discord = new Discord.Discord(GAME_ID, (ulong)Discord.CreateFlags.NoRequireDiscord);
 
-		UpdateTime();
-		SetStartupActivity();
+			UpdateTime();
+			SetStartupActivity();
+		} catch {
+			Debug.LogError("Discord Initializing failed");
+		}
 	}
 
 	void Update() {
+		if (discord == null) return;
+
 		try {
 			discord.RunCallbacks();
 		} catch {
-			Destroy(gameObject);
+			//Destroy(gameObject);
+			discord = null;
+			Debug.LogError("Discord disconnected");
 		}
 	}
 
 	public void SetStartupActivity() {
-		UpdateActivity(details, false);
+		UpdateActivity("System Ready", false);
 	}
 
 	public void SetEngageActivity() {
@@ -47,9 +55,7 @@ public class DiscordManager : MonoBehaviour {
 	public void SetDetonationActivity() {
 		var displayedTime = Mathf.Floor(WarheadController.Singleton.GetTimeUntilDetonation());
 
-		if (displayedTime <= 0) {
-			return;
-		}
+		if (displayedTime <= 0) return;
 
 		UpdateActivity($"Detonation in T-{displayedTime}", false);
 	}
@@ -75,14 +81,21 @@ public class DiscordManager : MonoBehaviour {
 					Start = time
 				}
 			};
-			
+
 			activityManager.UpdateActivity(newActivity, (res) => {
 				if (res != Discord.Result.Ok) {
 					Debug.LogWarning($"[{nameof(DiscordManager)}] Couldn't update activity! Error: {res}");
 				}
 			});
 		} catch {
-			Destroy(gameObject);
+			//Destroy(gameObject);
+
+			try {
+				TryReinitialize();
+				Debug.Log("Discord reconnected!");
+			} catch {
+				Debug.LogWarning("Reinitializing failed");
+			}
 		}
 	}
 
@@ -101,5 +114,23 @@ public class DiscordManager : MonoBehaviour {
 
 	public static bool IsExisting() {
 		return Singleton != null;
+	}
+
+	void TryReinitialize() {
+		discord = new Discord.Discord(GAME_ID, (ulong)Discord.CreateFlags.NoRequireDiscord);
+
+		var activityManager = discord.GetActivityManager();
+		var newActivity = new Discord.Activity {
+			Details = startDetails,
+			Timestamps = {
+				Start = time
+			}
+		};
+		
+		activityManager.UpdateActivity(newActivity, (res) => {
+			if (res != Discord.Result.Ok) {
+				Debug.LogWarning($"[{nameof(DiscordManager)}] Couldn't update activity! Error: {res}");
+			}
+		});
 	}
 }
