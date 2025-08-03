@@ -148,7 +148,7 @@ public class WarheadController : MonoBehaviour {
 		}
 
 #if !UNITY_EDITOR
-		var shutdownProcess = new ProcessStartInfo("shutdown", !doShutdown ? "/s /t 0" : "/g /t 0") {
+		var shutdownProcess = new ProcessStartInfo("shutdown", !doShutdown ? "/s /t 0" : "/r /t 0") {
 			CreateNoWindow = true,
 			UseShellExecute = false
 		};
