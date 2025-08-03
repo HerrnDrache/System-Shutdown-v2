@@ -10,6 +10,7 @@ public class InterfaceManipulation : MonoBehaviour {
 	[SerializeField] GameObject countdownText;
 	[SerializeField] GameObject countdownDisplay;
 	[SerializeField] GameObject engageButton;
+	[SerializeField] GameObject modeButton;
 	[SerializeField] GameObject warningText1;
 	[SerializeField] GameObject warningText2;
 	[SerializeField] TMP_Text statusDisplay;
@@ -18,10 +19,12 @@ public class InterfaceManipulation : MonoBehaviour {
 		Singleton = this;
 	}
 
-	public void HideEngageButton() {
+	public void HideMainMenu() {
 		KillCurrentTweens();
 
 		engageButton.GetComponent<Button>()
+			.interactable = false;
+		modeButton.GetComponent<Button>()
 			.interactable = false;
 
 		statusDisplay.GetComponent<TMP_Text>()
@@ -29,6 +32,10 @@ public class InterfaceManipulation : MonoBehaviour {
 		engageButton.GetComponent<Image>()
 			.DOFade(0f, 3f);
 		engageButton.GetComponentInChildren<TMP_Text>()
+			.DOFade(0f, 3f);
+		modeButton.GetComponent<Image>()
+			.DOFade(0f, 3f);
+		modeButton.GetComponentInChildren<TMP_Text>()
 			.DOFade(0f, 3f);
 		titeltext.GetComponent<TMP_Text>()
 			.DOFade(0f, 3f)
@@ -46,7 +53,7 @@ public class InterfaceManipulation : MonoBehaviour {
 		});
 	}
 
-	public void ShowEngageButton() {
+	public void ShowMainMenu() {
 		KillCurrentTweens();
 
 		countdownDisplay.GetComponent<TMP_Text>()
@@ -66,10 +73,16 @@ public class InterfaceManipulation : MonoBehaviour {
 					engageButton.GetComponent<Image>()
 						.DOFade(1f, 1f);
 					engageButton.GetComponentInChildren<TMP_Text>()
+						.DOFade(1f, 1f);
+					modeButton.GetComponent<Image>()
+						.DOFade(1f, 1f);
+					modeButton.GetComponentInChildren<TMP_Text>()
 						.DOFade(1f, 1f)
 
 					.OnComplete(() => {
 						engageButton.GetComponent<Button>()
+							.interactable = true;
+						modeButton.GetComponent<Button>()
 							.interactable = true;
 					});
 				});

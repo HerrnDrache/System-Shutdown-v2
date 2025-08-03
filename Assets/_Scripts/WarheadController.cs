@@ -10,6 +10,7 @@ public class WarheadController : MonoBehaviour {
 
 	[SerializeField] TMP_Text countdownDisplay;
 	[SerializeField] TMP_Text statusDisplay;
+	[SerializeField] TMP_Text modeDisplay;
 	[SerializeField] float displayTimeAfter;
 	[SerializeField] AudioSource source;
 	[SerializeField] AudioClip detonationSequenceClip;
@@ -20,8 +21,8 @@ public class WarheadController : MonoBehaviour {
 	bool isRunning;
 	bool counting20Secs;
 	bool shutdownInProgress;
+	bool doShutdown;
 
-	#region Getter
 	public bool GetIsRunning() {
 		return isRunning;
 	}
@@ -29,7 +30,6 @@ public class WarheadController : MonoBehaviour {
 	public float GetTimeUntilDetonation() {
 		return timeUntilDetonation;
 	}
-	#endregion
 
 	void Awake() {
 		Singleton = this;
@@ -38,6 +38,7 @@ public class WarheadController : MonoBehaviour {
 	void Start() {
 		ResetTimeUntilDetonation();
 		SetStatus("Ready", "#00ff00");
+		SetInfo("Shutdown", "#ff0000");
 	}
 
 	public void EngageWarhead() {
@@ -45,7 +46,7 @@ public class WarheadController : MonoBehaviour {
 			DiscordManager.Singleton.SetEngageActivity();
 		}
 	
-		InterfaceManipulation.Singleton.HideEngageButton();
+		InterfaceManipulation.Singleton.HideMainMenu();
 		isRunning = true;
 		counting20Secs = false;
 
@@ -60,13 +61,13 @@ public class WarheadController : MonoBehaviour {
 
 		Invoke(nameof(ResetTimeUntilDetonation), 1f);
 		CancelInvoke(nameof(UpdateDiscordActivity));
-		InterfaceManipulation.Singleton.ShowEngageButton();
+		InterfaceManipulation.Singleton.ShowMainMenu();
 		if (DiscordManager.IsExisting()) {
 			DiscordManager.Singleton.SetWaitingActivity();
 		}		
 		
 
-		InterfaceManipulation.Singleton.ShowEngageButton();
+		InterfaceManipulation.Singleton.ShowMainMenu();
 		isRunning = false;
 		source.Stop();
 
@@ -91,7 +92,10 @@ public class WarheadController : MonoBehaviour {
 		statusDisplay.text = $"SYSTEM STATUS: <color={colorHex}>{statusText}</color>";
 	}
 
-	#region Update
+	void SetInfo(string infoText, string colorHex) {
+		modeDisplay.text = $"Warhead Mode: <color={colorHex}>{infoText}</color>";
+	}
+
 	void Update() {
 		CountDown();
 		UpdateCountdownDisplay();
@@ -127,6 +131,16 @@ public class WarheadController : MonoBehaviour {
 		source.PlayOneShot(last20Secs);
 	}
 
+	public void SwitchMode() {
+		doShutdown = !doShutdown;
+
+		if (!doShutdown) {
+			SetInfo("Shutdown", "#ff0000");
+		} else {
+			SetInfo("Restart", "#f37907");
+		}
+	}
+
 	void SystemShutdown() {
 		shutdownInProgress = true;
 		if (DiscordManager.IsExisting()) {
@@ -134,14 +148,14 @@ public class WarheadController : MonoBehaviour {
 		}
 
 #if !UNITY_EDITOR
-		var shutdownProcess = new ProcessStartInfo("shutdown", "/s /t 0") {
+		var shutdownProcess = new ProcessStartInfo("shutdown", !doShutdown ? "/s /t 0" : "/g /t 0") {
 			CreateNoWindow = true,
 			UseShellExecute = false
 		};
 
 		Process.Start(shutdownProcess);
 #else
-		Debug.Log($"[{nameof(WarheadController)}] System now shutting down!");
+		Debug.Log($"System is now {(!doShutdown ? "shutting down" : "restarting")}!");
 #endif
 	}
 
@@ -164,5 +178,4 @@ public class WarheadController : MonoBehaviour {
 	void ResetTimeUntilDetonation() {
 		timeUntilDetonation = detonationSequenceClip.length;
 	}
-	#endregion
 }

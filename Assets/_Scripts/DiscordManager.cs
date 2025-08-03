@@ -9,7 +9,6 @@ public class DiscordManager : MonoBehaviour {
 	Discord.Discord discord;
 	long time;
 
-	[Header("Startup Activity")]
 	[SerializeField] string startDetails;
 
 	void Awake() {
@@ -38,7 +37,6 @@ public class DiscordManager : MonoBehaviour {
 		try {
 			discord.RunCallbacks();
 		} catch {
-			//Destroy(gameObject);
 			discord = null;
 			Debug.LogError("Discord disconnected");
 		}
@@ -88,8 +86,6 @@ public class DiscordManager : MonoBehaviour {
 				}
 			});
 		} catch {
-			//Destroy(gameObject);
-
 			try {
 				TryReinitialize();
 				Debug.Log("Discord reconnected!");
@@ -106,7 +102,6 @@ public class DiscordManager : MonoBehaviour {
 	void OnApplicationQuit() {
 		try {
 			discord.Dispose();
-			Debug.Log($"[{nameof(DiscordManager)}] Shutting down...");
 		} catch {
 			Destroy(gameObject);
 		}
