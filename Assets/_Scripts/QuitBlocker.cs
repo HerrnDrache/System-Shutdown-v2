@@ -2,7 +2,7 @@ using UnityEngine;
 
 public static class QuitBlocker {
 	static bool CanQuit() {
-		return !WarheadController.Singleton.GetIsRunning();
+		return !WarheadController.Singleton.IsRunning;
 	}
 	
 	[RuntimeInitializeOnLoadMethod]

@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class DiscordManager : MonoBehaviour {
@@ -43,7 +44,7 @@ public class DiscordManager : MonoBehaviour {
 	}
 
 	public void SetStartupActivity() {
-		UpdateActivity("System Ready", false);
+		UpdateActivity("System Ready", false, true);
 	}
 
 	public void SetEngageActivity() {
@@ -51,22 +52,37 @@ public class DiscordManager : MonoBehaviour {
 	}
 
 	public void SetDetonationActivity() {
-		var displayedTime = Mathf.Floor(WarheadController.Singleton.GetTimeUntilDetonation());
+		var displayedTime = Mathf.Floor(WarheadController.Singleton.TimeUntilDetonation);
 
 		if (displayedTime <= 0) return;
 
 		UpdateActivity($"Detonation in T-{displayedTime}", false);
 	}
 
-	public void SetShutdownActivity() {
-		UpdateActivity("Detonation completed, User offline since:", true);
+	public void SetOfflineActivity() {
+		if (WarheadController.Singleton.DoShutdown) {
+			UpdateActivity("Detonation completed, User offline since:", true);
+		} else {
+			UpdateActivity("Detonation completed, User returning soon...", true);
+		}
+		
 	}
 
 	public void SetWaitingActivity() {
 		UpdateActivity("System Restarting...", false);
 	}
 
-	public void UpdateActivity(string details, bool updateTime) {
+	public void UpdateActivity(string details, bool updateTime, bool doState = false) {
+		string state = null;
+
+		if (doState) {
+			state = WarheadController.Singleton.DoShutdown
+				? "Mode: Shutdown"
+				: "Mode: Restart";
+		}
+
+		Debug.Log("Update: " + WarheadController.Singleton.DoShutdown);
+
 		if (updateTime) {
 			UpdateTime();
 		}
@@ -75,6 +91,7 @@ public class DiscordManager : MonoBehaviour {
 			var activityManager = discord.GetActivityManager();
 			var newActivity = new Discord.Activity {
 				Details = details,
+				State = state,
 				Timestamps = {
 					Start = time
 				}

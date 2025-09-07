@@ -13,13 +13,13 @@ public class PlayerInput : MonoBehaviour {
 			return;
 		}
 
-		if (!WarheadController.Singleton.GetIsRunning()) return;
+		if (!WarheadController.Singleton.IsRunning) return;
 
 		cancelKeyPressTime += Time.fixedDeltaTime;
 	}
 
 	void Update() {
-		if (WarheadController.Singleton.GetTimeUntilDetonation() <= 20f) return;
+		if (WarheadController.Singleton.TimeUntilDetonation <= 20f) return;
 
 		if (cancelKeyPressTime < 3f) return;
 

@@ -1119,7 +1119,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Running WarheadOS v2.2.0
+  m_text: Running WarheadOS v2.3.0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e87703ff40356004a97d39319c255d15, type: 2}
   m_sharedMaterial: {fileID: 699253846153141623, guid: e87703ff40356004a97d39319c255d15, type: 2}
@@ -2013,6 +2013,7 @@ MonoBehaviour:
   detonationSequenceClip: {fileID: 8300000, guid: 60b4df69808fd064db5d124dc31ec9b5, type: 3}
   last20Secs: {fileID: 8300000, guid: 0dc9a94d08b0c924caea60f64fd96183, type: 3}
   cancelClip: {fileID: 8300000, guid: 8908ad62ea8127345af086cf8142b64d, type: 3}
+  clickclick: {fileID: 8300000, guid: 7307e607807d974478dccc414b37b523, type: 3}
 --- !u!114 &1394813546
 MonoBehaviour:
   m_ObjectHideFlags: 0
