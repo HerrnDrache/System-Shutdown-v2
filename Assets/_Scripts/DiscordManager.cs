@@ -81,8 +81,6 @@ public class DiscordManager : MonoBehaviour {
 				: "Mode: Restart";
 		}
 
-		Debug.Log("Update: " + WarheadController.Singleton.DoShutdown);
-
 		if (updateTime) {
 			UpdateTime();
 		}

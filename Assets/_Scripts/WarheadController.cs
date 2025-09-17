@@ -1,18 +1,10 @@
 using System.Collections;
 using System.Diagnostics;
-using System.Runtime.InteropServices.WindowsRuntime;
-using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
 
 public class WarheadController : MonoBehaviour {
 	public static WarheadController Singleton { get; private set; }
-
-	[SerializeField] TMP_Text countdownDisplay;
-	[SerializeField] TMP_Text statusDisplay;
-	[SerializeField] TMP_Text modeDisplay;
 	[SerializeField] float displayTimeAfter;
 	[SerializeField] AudioSource source;
 	[SerializeField] AudioClip detonationSequenceClip;
@@ -44,12 +36,10 @@ public class WarheadController : MonoBehaviour {
 
 	void Start() {
 		ResetTimeUntilDetonation();
-		SetStatus("Ready", "#00ff00");
-		SetInfo("Shutdown", "#ff0000");
 	}
 
 	public void EngageWarhead() {
-		Soundings();
+		ClickSound();
 
 		if (DiscordManager.IsExisting()) {
 			DiscordManager.Singleton.SetEngageActivity();
@@ -59,7 +49,7 @@ public class WarheadController : MonoBehaviour {
 		isRunning = true;
 		counting20Secs = false;
 
-		SetStatus("Running...", "#ff0000");
+		InterfaceManipulation.Singleton.SetStatus("Running...", "#ff0000");
 		source.clip = detonationSequenceClip;
 		source.Play();
 		InvokeRepeating(nameof(UpdateDiscordActivity), 12.5f, 5f);
@@ -67,7 +57,7 @@ public class WarheadController : MonoBehaviour {
 
 	public void CancelWarhead(bool playCancelSound) {
 		if (!isRunning) return;
-		Soundings();
+		ClickSound();
 
 		Invoke(nameof(ResetTimeUntilDetonation), 1f);
 		CancelInvoke(nameof(UpdateDiscordActivity));
@@ -75,13 +65,11 @@ public class WarheadController : MonoBehaviour {
 		if (DiscordManager.IsExisting()) {
 			DiscordManager.Singleton.SetWaitingActivity();
 		}
-
-
-		InterfaceManipulation.Singleton.ShowMainMenu();
+		
 		isRunning = false;
 		source.Stop();
 
-		SetStatus("Restarting...", "#ffff00");
+		InterfaceManipulation.Singleton.SetStatus("Restarting...", "#ffff00");
 		StartCoroutine(SetStatusReadyAfterDelay());
 
 		if (playCancelSound) {
@@ -92,19 +80,12 @@ public class WarheadController : MonoBehaviour {
 
 	IEnumerator SetStatusReadyAfterDelay() {
 		yield return new WaitForSeconds(20f);
-		SetStatus("Ready", "#00ff00");
+		InterfaceManipulation.Singleton.SetStatus("Ready", "#00ff00");
 		if (DiscordManager.IsExisting()) {
 			DiscordManager.Singleton.SetStartupActivity();
 		}
 	}
 
-	void SetStatus(string statusText, string colorHex) {
-		statusDisplay.text = $"SYSTEM STATUS: <color={colorHex}>{statusText}</color>";
-	}
-
-	void SetInfo(string infoText, string colorHex) {
-		modeDisplay.text = $"Warhead Mode: <color={colorHex}>{infoText}</color>";
-	}
 
 	void Update() {
 		CountDown();
@@ -132,7 +113,11 @@ public class WarheadController : MonoBehaviour {
 	}
 
 	void UpdateCountdownDisplay() {
-		countdownDisplay.text = RemainingTimeToString(timeUntilDetonation);
+		var remainingTime = RemainingTimeToString(timeUntilDetonation);
+
+
+		InterfaceManipulation.Singleton.CountdownText1.text = remainingTime;
+		InterfaceManipulation.Singleton.CountdownText2.text = remainingTime;
 	}
 
 	void CountLast20Secs() {
@@ -143,12 +128,12 @@ public class WarheadController : MonoBehaviour {
 
 	public void SwitchMode() {
 		doShutdown = !doShutdown;
-		Soundings();
+		ClickSound();
 
 		if (doShutdown) {
-			SetInfo("Shutdown", "#ff0000");
+			InterfaceManipulation.Singleton.SetInfo("Shutdown", "#ff0000");
 		} else {
-			SetInfo("Restart", "#f37907");
+			InterfaceManipulation.Singleton.SetInfo("Restart", "#f37907");
 		}
 
 		DiscordManager.Singleton.SetStartupActivity();
@@ -192,7 +177,7 @@ public class WarheadController : MonoBehaviour {
 		timeUntilDetonation = detonationSequenceClip.length;
 	}
 
-	void Soundings() {
+	void ClickSound() {
 		source.PlayOneShot(clickclick);
 	}
 }
