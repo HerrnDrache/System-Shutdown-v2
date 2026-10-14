@@ -2,6 +2,8 @@ using System.Collections;
 using System.Diagnostics;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using Mirror;
+using System;
 
 public class WarheadController : MonoBehaviour {
 	public static WarheadController Singleton { get; private set; }
@@ -11,6 +13,9 @@ public class WarheadController : MonoBehaviour {
 	[SerializeField] AudioClip last20Secs;
 	[SerializeField] AudioClip cancelClip;
 	[SerializeField] AudioClip clickclick;
+	[SerializeField] GameObject connectionMenu;
+
+	public String IPAdress { get; set; }
 
 	float timeUntilDetonation;
 	bool isRunning;
@@ -127,8 +132,21 @@ public class WarheadController : MonoBehaviour {
 	}
 
 	public void SwitchMode() {
-		doShutdown = !doShutdown;
 		ClickSound();
+
+		if (Input.GetKey(KeyCode.LeftControl)) {
+			NetworkManager.singleton.StartHost();
+
+			Debug.Log("KYS");
+			return;
+		} else if (Input.GetKey(KeyCode.RightControl)) {
+			connectionMenu.SetActive(true);
+
+			Debug.Log("SYK");
+			return;
+		}
+		//Somewhat Keychaos
+		doShutdown = !doShutdown;
 
 		if (doShutdown) {
 			InterfaceManipulation.Singleton.SetInfo("Shutdown", "#ff0000");
@@ -179,5 +197,10 @@ public class WarheadController : MonoBehaviour {
 
 	void ClickSound() {
 		source.PlayOneShot(clickclick);
+	}
+
+	public void ClientConnect() { //Server connecten
+		NetworkManager.singleton.networkAddress = IPAdress;
+		NetworkManager.singleton.StartClient();
 	}
 }
